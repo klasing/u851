@@ -9,13 +9,14 @@ package com.example.sunshine;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
-//import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -32,11 +33,14 @@ import com.example.sunshine.utilities.OpenWeatherJsonUtils;
 
 import java.net.URL;
 
+//import android.os.AsyncTask;
+
 //public class MainActivity extends AppCompatActivity implements
 //        ForecastAdapterOnClickHandler {
 public class MainActivity extends AppCompatActivity implements
         ForecastAdapter.ForecastAdapterOnClickHandler,
-        LoaderCallbacks<String[]> {
+        LoaderCallbacks<String[]>,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -49,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final int FORECAST_LOADER_ID = 0;
 
+    private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,8 +64,13 @@ public class MainActivity extends AppCompatActivity implements
 
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
 
+        //LinearLayoutManager layoutManager
+        //        = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
+        int recyclerViewOrientation = LinearLayoutManager.VERTICAL;
+        boolean shouldReverseLayout = false;
         LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                = new LinearLayoutManager(this, recyclerViewOrientation, shouldReverseLayout);
 
         mRecyclerView.setLayoutManager(layoutManager);
 
@@ -79,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements
 
         getSupportLoaderManager().initLoader(loaderId, bundleForLoader, callback);
 
+        Log.d(TAG, "onCreate: registering preference changed listener");
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .registerOnSharedPreferenceChangeListener(this);
         //loadWeatherData();
     }
 
@@ -149,7 +163,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void openLocationInMap() {
-        String addressString = "1600 Ampitheatre Parkway, CA";
+        //String addressString = "1600 Ampitheatre Parkway, CA";
+        String addressString = SunshinePreferences.getPreferredWeatherLocation(this);
         Uri geoLocation = Uri.parse("geo:0,0?q=" + addressString);
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -187,6 +202,24 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (PREFERENCES_HAVE_BEEN_UPDATED) {
+            Log.d(TAG, "onStart: preferences were updated");
+            getSupportLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
+            PREFERENCES_HAVE_BEEN_UPDATED = false;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.forecast, menu);
@@ -221,6 +254,10 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        PREFERENCES_HAVE_BEEN_UPDATED = true;
+    }
 
 //    private void loadWeatherData() {
 //        showWeatherDataView();
