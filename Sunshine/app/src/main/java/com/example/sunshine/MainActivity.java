@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void invalidateData() {
+
         mForecastAdapter.setWeatherData(null);
     }
 
@@ -208,6 +209,12 @@ public class MainActivity extends AppCompatActivity implements
 
         if (id == R.id.action_map) {
             openLocationInMap();
+            return true;
+        }
+
+        if (id == R.id.action_settings) {
+            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(startSettingsActivity);
             return true;
         }
 
