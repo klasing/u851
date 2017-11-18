@@ -9,9 +9,15 @@
 
     <string name="action_refresh">Refresh</string>
 
+    <string name="title_activity_detail">Details</string>
+
+    <string name="title_activity_settings">Settings</string>
+
     <string name="error_message">
         An error has occurred. Please try again by clicking REFRESH
     </string>
+
+    <string name="content_authority">com.example.android.sunshine</string>
 
     <!-- used by preferences -->
     <string name="pref_location_label">Location</string>
