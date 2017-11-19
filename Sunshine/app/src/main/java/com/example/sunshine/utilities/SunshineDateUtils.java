@@ -7,24 +7,20 @@ import com.example.sunshine.R;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public final class SunshineDateUtils {
 
-    public static final long SECOND_IN_MILLIS = 1000;
-    public static final long MINUTE_IN_MILLIS = SECOND_IN_MILLIS * 60;
-    public static final long HOUR_IN_MILLIS = MINUTE_IN_MILLIS * 60;
-    public static final long DAY_IN_MILLIS = HOUR_IN_MILLIS * 24;
+//    public static final long SECOND_IN_MILLIS = 1000;
+//    public static final long MINUTE_IN_MILLIS = SECOND_IN_MILLIS * 60;
+//    public static final long HOUR_IN_MILLIS = MINUTE_IN_MILLIS * 60;
+//    public static final long DAY_IN_MILLIS = HOUR_IN_MILLIS * 24;
+    public static final long DAY_IN_MILLIS = TimeUnit.DAYS.toMillis(1);
 
     public static long getDayNumber(long date) {
         TimeZone tz = TimeZone.getDefault();
         long gmtOffset = tz.getOffset(date);
         return (date + gmtOffset) / DAY_IN_MILLIS;
-    }
-
-    public static long normalizeDate(long date) {
-        // Normalize the start date to the beginning of the (UTC) day in local time
-        long retValNew = date / DAY_IN_MILLIS * DAY_IN_MILLIS;
-        return retValNew;
     }
 
     public static long getLocalDateFromUTC(long utcDate) {
@@ -37,6 +33,53 @@ public final class SunshineDateUtils {
         TimeZone tz = TimeZone.getDefault();
         long gmtOffset = tz.getOffset(localDate);
         return localDate + gmtOffset;
+    }
+
+    public static long getNormalizedUtcDateForToday() {
+
+        long utcNowMillis = System.currentTimeMillis();
+
+        TimeZone currentTimeZone = TimeZone.getDefault();
+
+        long gmtOffsetMillis = currentTimeZone.getOffset(utcNowMillis);
+
+       long timeSinceEpochLocalTimeMillis = utcNowMillis + gmtOffsetMillis;
+
+        long daysSinceEpochLocal = TimeUnit.MILLISECONDS.toDays(timeSinceEpochLocalTimeMillis);
+
+        long normalizedUtcMidnightMillis = TimeUnit.DAYS.toMillis(daysSinceEpochLocal);
+
+        return normalizedUtcMidnightMillis;
+    }
+
+    private static long elapsedDaysSinceEpoch(long utcDate) {
+        return TimeUnit.MILLISECONDS.toDays(utcDate);
+    }
+
+    public static long normalizeDate(long date) {
+        // Normalize the start date to the beginning of the (UTC) day in local time
+//        long retValNew = date / DAY_IN_MILLIS * DAY_IN_MILLIS;
+//        return retValNew;
+        long daysSinceEpoch = elapsedDaysSinceEpoch(date);
+        long millisFromEpochToTodayAtMidnightUtc = daysSinceEpoch * DAY_IN_MILLIS;
+        return millisFromEpochToTodayAtMidnightUtc;
+    }
+
+    public static boolean isDateNormalized(long millisSinceEpoch) {
+        boolean isDateNormalized = false;
+        if (millisSinceEpoch % DAY_IN_MILLIS == 0) {
+            isDateNormalized = true;
+        }
+
+        return isDateNormalized;
+    }
+
+    private static long getLocalMidnightFromNormalizedUtcDate(long normalizedUtcDate) {
+        TimeZone timeZone = TimeZone.getDefault();
+
+        long gmtOffset = timeZone.getOffset(normalizedUtcDate);
+        long localMidnightMillis = normalizedUtcDate - gmtOffset;
+        return localMidnightMillis;
     }
 
     public static String getFriendlyDateString(Context context, long dateInMillis, boolean showFullDate) {
