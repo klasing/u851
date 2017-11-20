@@ -1,6 +1,5 @@
 package com.example.sunshine;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -119,26 +118,32 @@ public class MainActivity extends AppCompatActivity implements
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         mForecastAdapter.swapCursor(data);
-
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
-
         mRecyclerView.smoothScrollToPosition(mPosition);
-
         if (data.getCount() != 0) showWeatherDataView();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+
         mForecastAdapter.swapCursor(null);
     }
 
+//    @Override
+//    public void onClick(long date) {
+//        Context context = this;
+//        Class destinationClass = DetailActivity.class;
+//        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
+//        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
+//        startActivity(intentToStartDetailActivity);
+//    }
+
     @Override
-    public void onClick(String weatherForDay) {
-        Context context = this;
-        Class destinationClass = DetailActivity.class;
-        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, weatherForDay);
-        startActivity(intentToStartDetailActivity);
+    public void onClick(long date) {
+        Intent weatherDetailIntent = new Intent(MainActivity.this, DetailActivity.class);
+        Uri uriForDateClicked = WeatherContract.WeatherEntry.buildWeatherUriWithDate(date);
+        weatherDetailIntent.setData(uriForDateClicked);
+        startActivity(weatherDetailIntent);
     }
 
     private void showWeatherDataView() {
