@@ -19,7 +19,7 @@ import android.widget.ProgressBar;
 
 import com.example.sunshine.data.SunshinePreferences;
 import com.example.sunshine.data.WeatherContract;
-import com.example.sunshine.utilities.FakeDataUtils;
+import com.example.sunshine.sync.SunshineSyncUtils;
 
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor>,
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_forecast);
         getSupportActionBar().setElevation(0f);
 
-        FakeDataUtils.insertFakeData(this);
+        //FakeDataUtils.insertFakeData(this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_forecast);
 
@@ -73,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements
         showLoading();
 
         getSupportLoaderManager().initLoader(ID_FORECAST_LOADER, null, this);
+
+        SunshineSyncUtils.startImmediateSync(this);
     }
 
     private void openPreferredLocationInMap() {

@@ -19,6 +19,15 @@ public class SunshinePreferences {
     private static final String DEFAULT_MAP_LOCATION =
             "1600 Amphitheatre Parkway, Mountain View, CA 94043";
 
+    public static void setLocationDetails(Context context, double lat, double lon) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+
+        editor.putLong(PREF_COORD_LAT, Double.doubleToRawLongBits(lat));
+        editor.putLong(PREF_COORD_LONG, Double.doubleToRawLongBits(lon));
+        editor.apply();
+    }
+
     static public void setLocationDetails(Context c, String cityName, double lat, double lon) {
     }
 
