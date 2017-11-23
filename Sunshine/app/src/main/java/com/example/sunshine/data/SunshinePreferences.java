@@ -8,16 +8,16 @@ import com.example.sunshine.R;
 
 public class SunshinePreferences {
 
-    public static final String PREF_CITY_NAME = "city_name";
+    //public static final String PREF_CITY_NAME = "city_name";
 
     public static final String PREF_COORD_LAT = "coord_lat";
     public static final String PREF_COORD_LONG = "coord_long";
 
-    private static final String DEFAULT_WEATHER_LOCATION = "94043,USA";
-    private static final double[] DEFAULT_WEATHER_COORDINATES = {37.4284, 122.0724};
+    //private static final String DEFAULT_WEATHER_LOCATION = "94043,USA";
+    //private static final double[] DEFAULT_WEATHER_COORDINATES = {37.4284, 122.0724};
 
-    private static final String DEFAULT_MAP_LOCATION =
-            "1600 Amphitheatre Parkway, Mountain View, CA 94043";
+    //private static final String DEFAULT_MAP_LOCATION =
+    //        "1600 Amphitheatre Parkway, Mountain View, CA 94043";
 
     public static void setLocationDetails(Context context, double lat, double lon) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
@@ -28,20 +28,26 @@ public class SunshinePreferences {
         editor.apply();
     }
 
-    static public void setLocationDetails(Context c, String cityName, double lat, double lon) {
-    }
-
     static public void setLocation(Context c, String locationSetting, double lat, double lon) {
     }
 
-    static public void resetLocationCoordinates(Context c) {
+    public static void resetLocationCoordinates(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+
+        editor.remove(PREF_COORD_LAT);
+        editor.remove(PREF_COORD_LONG);
+        editor.apply();
     }
 
     public static String getPreferredWeatherLocation(Context context) {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(context);
+//        String keyForLocation = context.getString(R.string.pref_location_key);
+//        String defaultLocation = context.getString(R.string.pref_location_default);
         String keyForLocation = context.getString(R.string.pref_location_key);
         String defaultLocation = context.getString(R.string.pref_location_default);
+
         return prefs.getString(keyForLocation, defaultLocation);
     }
 
@@ -130,13 +136,13 @@ public class SunshinePreferences {
         editor.apply();
     }
 
-    private static String getDefaultWeatherLocation() {
-
-        return DEFAULT_WEATHER_LOCATION;
-    }
-
-    public static double[] getDefaultWeatherCoordinates() {
-
-        return DEFAULT_WEATHER_COORDINATES;
-    }
+//    private static String getDefaultWeatherLocation() {
+//
+//        return DEFAULT_WEATHER_LOCATION;
+//    }
+//
+//    public static double[] getDefaultWeatherCoordinates() {
+//
+//        return DEFAULT_WEATHER_COORDINATES;
+//    }
 }
